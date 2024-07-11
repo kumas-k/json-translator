@@ -16,10 +16,6 @@ const App = () => {
 
   useEffect(() => {
     init(cookies)
-
-    if (Object.values(cookies).length === 0) {
-      setIsOpen(true)
-    }
   }, [cookies, init])
 
   return (
