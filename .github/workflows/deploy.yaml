@@ -1,10 +1,31 @@
 name: Deploy GitHub Pages
 
 on:
-  repository_dispatch:
-    types: ['deploy']
+  push:
 
 jobs:
+  wait-for-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Wait for CI check to pass
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-ci
+        with:
+          token: ${{ secrets.GH_ACTIONS_TOKEN }}
+          checkName: build
+          ref: ${{ github.event.head }}
+
+      - name: Stop workflow
+        if: steps.wait-for-ci.outputs.conclusion != 'success'
+        run: node -e 'process.exit(1)'
+
   build:
     runs-on: ubuntu-latest
     steps:
