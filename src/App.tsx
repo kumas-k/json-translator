@@ -7,11 +7,13 @@ import Preference from './components/preference'
 import usePreferenceStore from './stores/preference-store'
 import { useCookies } from 'react-cookie'
 import Header from './components/header'
+import Manual from './components/manual'
 
 const App = () => {
   const [cookies] = useCookies(['engine', 'target', 'key'])
   const { source } = useSourceStore()
-  const [isOpen, setIsOpen] = useState(false)
+  const [isPreferenceOpen, setIsPreferenceOpen] = useState(false)
+  const [isManualOpen, setIsManualOpen] = useState(false)
   const { init } = usePreferenceStore()
 
   useEffect(() => {
@@ -20,9 +22,20 @@ const App = () => {
 
   return (
     <>
-      <Header openPreference={() => setIsOpen(true)} />
+      <Header
+        openPreference={() => setIsPreferenceOpen(true)}
+        openManual={() => setIsManualOpen(true)}
+      />
       <main>
-        {isOpen && <Preference isOpen={isOpen} setIsOpen={setIsOpen} />}
+        {isPreferenceOpen && (
+          <Preference
+            isOpen={isPreferenceOpen}
+            setIsOpen={setIsPreferenceOpen}
+          />
+        )}
+        {isManualOpen && (
+          <Manual isOpen={isManualOpen} setIsOpen={setIsManualOpen} />
+        )}
         {source.length <= 0 ? (
           <SourceUploader />
         ) : (

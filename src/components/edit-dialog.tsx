@@ -1,5 +1,6 @@
 import { Button, Dialog, Flex, TextArea, Text } from '@radix-ui/themes'
-import { useCallback, useState } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
+import { useCallback, useRef, useState } from 'react'
 import useSourceStore from '../stores/source-store'
 import { fetchTranslate } from '../utils/fetch-translate'
 import LoadingButton from './loading-button'
@@ -12,24 +13,45 @@ type Props = {
 }
 
 const EditDialog = ({ isOpen, setIsOpen, text }: Props) => {
-  const { source, currentIndex, replaceSourceValue } = useSourceStore()
+  const { source, currentIndex, setCurrentIndex, replaceSourceValue } =
+    useSourceStore()
   const { engine, key, target } = usePreferenceStore()
   const [value, setValue] = useState<string>(text)
+  const translateRef = useRef<HTMLButtonElement>(null)
+
+  useHotkeys(
+    'mod+enter, mod+k',
+    (_, { mod, keys }) => {
+      const [key] = keys ?? []
+
+      if (key === 'enter' && mod) {
+        onClick()
+      }
+
+      if (key === 'k' && mod) {
+        translateRef.current?.click()
+      }
+    },
+    { enableOnFormTags: true },
+  )
 
   const onClick = useCallback(() => {
-    if (!value) {
-      alert('입력한 값이 없습니다.')
-
-      return
-    }
-
     const line = source[currentIndex]
 
     const replace = line.replace(`"${text}"`, `"${value.replace(/"/g, '')}"`)
 
     replaceSourceValue(replace)
     setIsOpen(false)
-  }, [currentIndex, replaceSourceValue, setIsOpen, source, text, value])
+    setCurrentIndex(currentIndex + 1)
+  }, [
+    currentIndex,
+    replaceSourceValue,
+    setCurrentIndex,
+    setIsOpen,
+    source,
+    text,
+    value,
+  ])
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={() => setIsOpen(false)}>
@@ -64,6 +86,7 @@ const EditDialog = ({ isOpen, setIsOpen, text }: Props) => {
 
         <Flex gap="3" mt="4" justify="end">
           <LoadingButton
+            ref={translateRef}
             disabled={!value}
             color="purple"
             onClick={() =>
