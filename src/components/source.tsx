@@ -4,6 +4,7 @@ import { Box } from '@radix-ui/themes'
 import useSourceStore from '../stores/source-store'
 import { sourceLineValidate } from '../utils/source-line-validate'
 import EditDialog from './edit-dialog'
+import { useHotkeys } from 'react-hotkeys-hook'
 
 const ROW_SIZE = 1000
 
@@ -24,6 +25,24 @@ const Source = () => {
   const { source, currentIndex, setCurrentIndex, page } = useSourceStore()
   const [isOpen, setIsOpen] = useState(false)
   const [text, setText] = useState('')
+
+  useHotkeys('mod+enter', (_, { mod, keys }) => {
+    const [key] = keys ?? []
+
+    if (key === 'enter' && mod) {
+      const index = pageIndex + currentIndex
+      const text = source.at(index) ?? ''
+
+      if (!sourceLineValidate(text)) {
+        return
+      }
+
+      const { value } = parseLine(text)
+
+      setIsOpen(true)
+      setText(value)
+    }
+  })
 
   useEffect(() => {
     if (source.length <= 0) {

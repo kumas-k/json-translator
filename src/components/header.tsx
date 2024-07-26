@@ -6,9 +6,10 @@ import usePreferenceStore from '../stores/preference-store'
 
 type Props = {
   openPreference: () => void
+  openManual: () => void
 }
 
-const Header = ({ openPreference }: Props) => {
+const Header = ({ openPreference, openManual }: Props) => {
   const { setSourceFile } = useSourceFileLoader()
   const { source } = useSourceStore()
   const { target } = usePreferenceStore()
@@ -52,6 +53,8 @@ const Header = ({ openPreference }: Props) => {
           <DropdownMenu.Item onClick={openPreference}>
             Preference
           </DropdownMenu.Item>
+          <DropdownMenu.Separator />
+          <DropdownMenu.Item onClick={openManual}>Manual</DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Root>
     </header>
